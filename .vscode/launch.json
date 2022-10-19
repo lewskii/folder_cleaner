@@ -7,15 +7,15 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug executable 'desktop_cleaner'",
+            "name": "Debug executable 'folder_cleaner'",
             "cargo": {
                 "args": [
                     "build",
-                    "--bin=desktop_cleaner",
-                    "--package=desktop_cleaner"
+                    "--bin=folder_cleaner",
+                    "--package=folder_cleaner"
                 ],
                 "filter": {
-                    "name": "desktop_cleaner",
+                    "name": "folder_cleaner",
                     "kind": "bin"
                 }
             },
@@ -25,16 +25,16 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug unit tests in executable 'desktop_cleaner'",
+            "name": "Debug unit tests in executable 'folder_cleaner'",
             "cargo": {
                 "args": [
                     "test",
                     "--no-run",
-                    "--bin=desktop_cleaner",
-                    "--package=desktop_cleaner"
+                    "--bin=folder_cleaner",
+                    "--package=folder_cleaner"
                 ],
                 "filter": {
-                    "name": "desktop_cleaner",
+                    "name": "folder_cleaner",
                     "kind": "bin"
                 }
             },
