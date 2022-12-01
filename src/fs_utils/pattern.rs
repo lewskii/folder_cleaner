@@ -1,6 +1,7 @@
 use std::path::Path;
 
 
+/// Patterns for selecting files and directories based on certain criteria.
 #[non_exhaustive]
 pub enum FilePattern {
     Any,

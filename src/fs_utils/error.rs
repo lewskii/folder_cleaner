@@ -1,7 +1,17 @@
+//! Tools for handling file system errors.
+//! 
+//! This module provides functions that make certain file system errors
+//! less verbose to handle as well as a specialised error type.
+
 use std::io;
 use std::path::{Path, PathBuf};
 
 
+/// Represents errors that occur when trying to remove files or directories.
+/// 
+/// Contains the underlying error returned by the operating system as well as
+/// the path to the file or directory that couldn't be removed because of
+/// the error.
 #[derive(Debug)]
 pub struct FailedToRemove {
     path: PathBuf,
@@ -9,6 +19,7 @@ pub struct FailedToRemove {
 }
 
 impl FailedToRemove {
+    /// Creates a new error from a path and an I/O error.
     pub fn new(path: &Path, source: io::Error) -> Self {
         FailedToRemove {
             path: path.to_path_buf(),
@@ -16,11 +27,19 @@ impl FailedToRemove {
         }
     }
 
+    /// The path to the file or directory that couldn't be removed.
     pub fn path(&self) -> &Path {
         &self.path
     }
 
-    pub fn source(&self) -> &io::Error {
+    /// The lower-level source of this error.
+    /// 
+    /// It's often more convenient for a user to receive the underlying error
+    /// with its original [`io::Error`] type rather than the more generic
+    /// [`std::error::Error`] that [`source()`] returns.
+    /// 
+    /// [`source()`]: std::error::Error::source
+    pub fn io_source(&self) -> &io::Error {
         &self.source
     }
 }
@@ -36,39 +55,19 @@ impl std::fmt::Display for FailedToRemove {
     }
 }
 
-impl std::error::Error for FailedToRemove {}
+impl std::error::Error for FailedToRemove {
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+        Some(&self.source)
+    }
+}
 
 
-/// Checks whether an IO error is of the kind NotFound.
-///
-/// # Examples
-///
-/// ```
-/// use std::io;
-/// use folder_cleaner::fs_utils::error::not_found;
-/// 
-/// let e = io::Error::from(io::ErrorKind::NotFound);
-/// assert_eq!(not_found(&e), true);
-/// ```
+/// Does an error signal that a path wasn't found?
 pub fn not_found(e: &io::Error) -> bool {
     e.kind() == io::ErrorKind::NotFound
 }
 
-/// Checks whether an IO error is of the kind NotADirectory.
-/// 
-/// [`std::io::ErrorKind::NotADirectory`] is currently unstable and thus can't be
-/// used directly in stable Rust, but it is still sometimes emitted by
-/// the standard library.
-///
-/// # Examples
-///
-/// ```
-/// use std::io;
-/// use folder_cleaner::fs_utils::error::not_a_directory;
-///
-/// let e = io::Error::from_raw_os_error(267);
-/// assert_eq!(not_a_directory(&e), true);
-/// ```
+/// Does an error signal that a path was unexpectedly not a directory?
 pub fn not_a_directory(e: &io::Error) -> bool {
     // check against the Windows error code
     // because io::ErrorKind::NotADirectory is unstable
