@@ -28,11 +28,13 @@
 
 use std::path::PathBuf;
 use std::thread;
-use time::Duration;
+use serde::{Serialize, Deserialize};
+use std::time::Duration;
 
 use crate::fs_utils::{self, FilePattern};
 
 
+#[derive(Serialize, Deserialize)]
 /// A routine to clear a directory based on a pattern.
 /// 
 /// Can be [`run`](Self::run()) to clear the directory once.
@@ -51,7 +53,7 @@ use crate::fs_utils::{self, FilePattern};
 /// use folder_cleaner::fs_utils::FilePattern;
 /// use folder_cleaner::routine::Routine;
 /// use std::path::PathBuf;
-/// use time::Duration;
+/// use std::time::Duration;
 /// 
 /// let desktop_routine = Routine {
 ///     directory: PathBuf::from(r"C:\Users\user\Desktop"),
@@ -101,7 +103,7 @@ pub fn spawn_routine(routine: Routine) -> thread::JoinHandle<()> {
         loop {
             routine.run();
 
-            thread::sleep(routine.interval.unsigned_abs());
+            thread::sleep(routine.interval);
         }
     })
 }
